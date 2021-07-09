@@ -28,10 +28,33 @@ from .models import (
     RaceEthnicity,
     Session,
     Student,
+    TestModel,
+    HelloWorldModel
 )
 
 User = get_user_model()
 
+@admin.register(HelloWorldModel)
+class HelloWorldModelAdmin(ImportExportActionModelAdmin):
+    list_display = [
+        "test",
+        "body",
+    ]
+
+    view_on_site = False
+
+@admin.register(TestModel)
+class TestModelAdmin(ImportExportActionModelAdmin):
+    list_display = [
+        "Name",
+        "id",
+    ]
+
+    ordering = [
+        "-Name",
+    ]
+
+    view_on_site = False
 
 @admin.register(User)
 class UserAdmin(ImportExportActionModelAdmin):

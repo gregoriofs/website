@@ -183,6 +183,10 @@ DATABASES["salesforce"] = {
     "HOST": os.environ.get("SALESFORCE_HOST"),
 }
 
+DATABASE_ROUTERS = [
+    "salesforce.router.ModelRouter"
+]
+
 # Password validation
 # https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators
 

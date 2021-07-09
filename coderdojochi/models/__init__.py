@@ -13,3 +13,4 @@ from .race_ethnicity import *
 from .session import *
 from .student import *
 from .user import *
+from .testmodel import *
