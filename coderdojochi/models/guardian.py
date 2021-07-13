@@ -7,13 +7,22 @@ import salesforce
 
 class Guardian(salesforce.models.SalesforceModel):
     # class Guardian(CommonInfo)
+
+    HISPANIC = "Hispanic"
+    NOT_HISPANIC = "Not Hispanic"
+
+    ETHNICITY = [
+        (HISPANIC,"Hispanic"),
+        (NOT_HISPANIC,"Not Hispanic"),
+    ]
+
     user = salesforce.models.ForeignKey(
         CDCUser,
         on_delete=salesforce.models.PROTECT,
     )
     is_active = salesforce.models.BooleanField(
         db_column="Active__c",
-        default=True,
+        
     )
     phone = salesforce.models.CharField(
         db_column="Phone",
@@ -41,11 +50,26 @@ class Guardian(salesforce.models.SalesforceModel):
     #     RaceEthnicity,
     #     blank=False,
     # )
+    
+    ethnicity = salesforce.models.CharField(
+        choices=ETHNICITY,
+        max_length=255,
+        db_column="hed__Ethnicity__c",
+        default=""
+    )
+    race = salesforce.models.CharField(
+        max_length=255,
+        db_column="hed__Race__c",
+        default=""
+    )
 
     def __str__(self):
         return self.full_name
+
     class Meta:
         db_table = "Contact"
+        managed=True
+
     @property
     def first_name(self):
         return self.user.first_name

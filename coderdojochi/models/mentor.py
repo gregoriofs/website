@@ -21,6 +21,15 @@ def generate_filename(instance, filename):
 # TODO: Add MentorManager
 class Mentor(salesforce.models.SalesforceModel):
     # Mentor(CommonInfo)
+    
+    HISPANIC = "Hispanic"
+    NOT_HISPANIC = "Not Hispanic"
+
+    ETHNICITY = [
+        (HISPANIC,"Hispanic"),
+        (NOT_HISPANIC,"Not Hispanic"),
+    ]
+
     user = salesforce.models.ForeignKey(
         CDCUser,
         on_delete=salesforce.models.PROTECT,
@@ -52,9 +61,9 @@ class Mentor(salesforce.models.SalesforceModel):
     #         },
     #     },
     # )
-    # avatar_approved = models.BooleanField(
-    #     default=False,
-    # )
+    avatar_approved = salesforce.models.BooleanField(
+        default=False,
+    )
     birthday = salesforce.models.DateField(
         blank=False,
         null=True,
@@ -71,6 +80,18 @@ class Mentor(salesforce.models.SalesforceModel):
     #     RaceEthnicity,
     #     blank=False,
     # )
+    ethnicity = salesforce.models.CharField(
+        choices=ETHNICITY,
+        max_length=255,
+        db_column="hed__Ethnicity__c",
+        default=""
+    )
+    race = salesforce.models.CharField(
+        max_length=255,
+        db_column="hed__Race__c",
+        default=""
+    )
+
     work_place = salesforce.models.CharField(
         max_length=255,
         blank=True,

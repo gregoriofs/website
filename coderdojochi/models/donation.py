@@ -1,56 +1,67 @@
 from django.contrib.contenttypes.models import ContentType
-from django.db import models
+# from django.db import models
 from django.urls import reverse
 
 from .common import CommonInfo
 
+import salesforce
 
-class Donation(CommonInfo):
+class Donation(salesforce.models.SalesforceModel):
+    # class Donation(CommonInfo):
     from .session import Session
     from .user import CDCUser
 
-    user = models.ForeignKey(
+    user = salesforce.models.ForeignKey(
         CDCUser,
         blank=True,
         null=True,
-        on_delete=models.CASCADE,
+        on_delete=salesforce.models.DO_NOTHING,
     )
-    session = models.ForeignKey(
+    session = salesforce.models.ForeignKey(
         Session,
         blank=True,
         null=True,
-        on_delete=models.CASCADE,
+        on_delete=salesforce.models.DO_NOTHING,
+        db_column="Course_Offering__c",
     )
-    first_name = models.CharField(
+    first_name = salesforce.models.CharField(
         max_length=255,
         blank=True,
         null=True,
+        db_column="First_Name__c"
     )
-    last_name = models.CharField(
+    last_name = salesforce.models.CharField(
         max_length=255,
         blank=True,
         null=True,
+        db_column="Last_Name__c"
     )
-    referral_code = models.CharField(
+    referral_code = salesforce.models.CharField(
         max_length=255,
         blank=True,
         null=True,
+        db_column="Referral_Code__c"
     )
-    email = models.EmailField(
+    email = salesforce.models.EmailField(
         blank=True,
         null=True,
+        db_column="Email__c"
     )
-    amount = models.IntegerField()
-    is_verified = models.BooleanField(
-        default=False,
+    amount = salesforce.models.IntegerField()
+    is_verified = salesforce.models.BooleanField(
+        db_column="Is_Verified__c",
     )
-    receipt_sent = models.BooleanField(
-        default=False,
+    receipt_sent = salesforce.models.BooleanField(
+        db_column="Receipt_Sent__c",
     )
 
     def __str__(self):
         return f"{self.email} | ${self.amount}"
 
+    class Meta:
+        db_table="Donation__c"
+        managed=True
+        
     def get_admin_url(self):
         content_type = ContentType.objects.get_for_model(self.__class__)
         return reverse(

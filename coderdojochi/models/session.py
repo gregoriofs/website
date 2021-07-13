@@ -35,9 +35,10 @@ class Session(salesforce.models.SalesforceModel):
 
     location = salesforce.models.ForeignKey(
         Location,
-        db_column = "hed__Facility__c",
+        db_column = "Offering_Location__c",
         on_delete=salesforce.models.PROTECT,
-        limit_choices_to={"is_active": True},
+        default="",
+        # limit_choices_to={"is_active": True},
     )
     capacity = salesforce.models.IntegerField(
         db_column = "hed__Capacity__c",
@@ -238,7 +239,8 @@ class Session(salesforce.models.SalesforceModel):
 
     class Meta:
         db_table = "hed__Course_Offering__c"
-
+        managed=True
+    
     @property
     def end_date(self):
         # Some records have a defined record with the end date,

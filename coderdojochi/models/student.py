@@ -10,6 +10,13 @@ from .race_ethnicity import RaceEthnicity
 class Student(salesforce.models.SalesforceModel):
     from .guardian import Guardian
 
+    HISPANIC = "Hispanic"
+    NOT_HISPANIC = "Not Hispanic"
+
+    ETHNICITY = [
+        (HISPANIC,"Hispanic"),
+        (NOT_HISPANIC,"Not Hispanic"),
+    ]
     guardian = salesforce.models.ForeignKey(
         Guardian,
         on_delete=salesforce.models.PROTECT,
@@ -29,6 +36,18 @@ class Student(salesforce.models.SalesforceModel):
         db_column="Gender__c",
         max_length=255,
     )
+    ethnicity = salesforce.models.CharField(
+        choices=ETHNICITY,
+        max_length=255,
+        db_column="hed__Ethnicity__c",
+        default=""
+    )
+    race = salesforce.models.CharField(
+        max_length=255,
+        db_column="hed__Race__c",
+        default=""
+    )
+    
     # race_ethnicity = salesforce.models.ManyToManyField(
     #     RaceEthnicity,
     #     # db_column = "hed__Race__c",
