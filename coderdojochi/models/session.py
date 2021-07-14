@@ -1,18 +1,22 @@
 from datetime import timedelta
 
+from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.urls.base import reverse
 from django.utils import formats
 from django.utils.functional import cached_property
 
+from coderdojochi.models.user import CDCUser
+
 from .common import CommonInfo
+
+User = get_user_model()
 
 
 class Session(CommonInfo):
     from .course import Course
     from .location import Location
-    from .mentor import Mentor
     from .student import Student
 
     MALE = "male"
@@ -41,10 +45,11 @@ class Session(CommonInfo):
         default=10,
     )
     instructor = models.ForeignKey(
-        Mentor,
+        User,
         on_delete=models.CASCADE,
         related_name="session_instructor",
         limit_choices_to={
+            "user__role": CDCUser.MENTOR,
             "user__groups__name": "Instructor",
             "is_active": True,
             "user__is_active": True,
@@ -55,10 +60,11 @@ class Session(CommonInfo):
     )
 
     assistant = models.ManyToManyField(
-        Mentor,
+        User,
         blank=True,
         related_name="session_assistant",
         limit_choices_to={
+            "user__role": CDCUser.MENTOR,
             "user__groups__name": "Assistant",
             "is_active": True,
             "user__is_active": True,
@@ -90,16 +96,16 @@ class Session(CommonInfo):
 
     # Extra
     additional_info = models.TextField(blank=True, null=True, help_text="Basic HTML allowed")
-    waitlist_mentors = models.ManyToManyField(
-        Mentor,
-        blank=True,
-        related_name="session_waitlist_mentors",
-    )
-    waitlist_students = models.ManyToManyField(
-        Student,
-        blank=True,
-        related_name="session_waitlist_students",
-    )
+    # waitlist_mentors = models.ManyToManyField(
+    #     Mentor,
+    #     blank=True,
+    #     related_name="session_waitlist_mentors",
+    # )
+    # waitlist_students = models.ManyToManyField(
+    #     Student,
+    #     blank=True,
+    #     related_name="session_waitlist_students",
+    # )
     external_enrollment_url = models.CharField(
         max_length=255,
         blank=True,

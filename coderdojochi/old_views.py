@@ -1,3 +1,4 @@
+from coderdojochi.models.user import CDCUser
 import logging
 import operator
 from collections import Counter
@@ -18,6 +19,9 @@ from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_exempt
 
 import arrow
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 from coderdojochi.forms import DonationForm, StudentForm
 from coderdojochi.models import (
@@ -27,7 +31,6 @@ from coderdojochi.models import (
     Guardian,
     Meeting,
     MeetingOrder,
-    Mentor,
     MentorOrder,
     Order,
     Session,
@@ -57,12 +60,13 @@ def home(request, template_name="home.html"):
 
 def volunteer(request, template_name="volunteer.html"):
     mentors = (
-        Mentor.objects.select_related("user")
+        User.objects.select_related("user")
         .filter(
             is_active=True,
             is_public=True,
             background_check=True,
             avatar_approved=True,
+            role=CDCUser.MENTOR,
         )
         .annotate(session_count=Count("mentororder"))
         .order_by("-user__role", "-session_count")
@@ -77,7 +81,7 @@ def volunteer(request, template_name="volunteer.html"):
 
 @login_required
 def mentor_approve_avatar(request, pk=None):
-    mentor = get_object_or_404(Mentor, id=pk)
+    mentor = get_object_or_404(User, id=pk,role=CDCUser.MENTOR)
 
     if not request.user.is_staff:
         messages.error(request, "You do not have permissions to moderate content.")
@@ -106,7 +110,7 @@ def mentor_approve_avatar(request, pk=None):
 
 @login_required
 def mentor_reject_avatar(request, pk=None):
-    mentor = get_object_or_404(Mentor, id=pk)
+    mentor = get_object_or_404(User, id=pk,role=CDCUser.MENTOR)
 
     if not request.user.is_staff:
         messages.error(request, "You do not have permissions to moderate content.")
@@ -555,7 +559,8 @@ def session_announce_mentors(request, pk):
         recipients = []
 
         # send mentor announcements
-        mentors = Mentor.objects.filter(
+        mentors = User.objects.filter(
+            role=CDCUser.MENTOR,
             is_active=True,
             user__is_active=True,
         )

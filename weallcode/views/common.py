@@ -13,7 +13,10 @@ from django.views.generic import FormView, TemplateView
 from meta.views import MetadataMixin
 from sentry_sdk import capture_message
 
-from coderdojochi.models import Course, Mentor, Session
+from django.contrib.auth import get_user_model
+User = get_user_model()
+
+from coderdojochi.models import Course, Session
 
 from ..forms import ContactForm
 from ..models import AssociateBoardMember, BoardMember, StaffMember

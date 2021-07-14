@@ -1,10 +1,13 @@
+from coderdojochi.models.user import CDCUser
+from django.contrib.auth import get_user_model
 from django.db import models
 from django.urls import reverse
 from django.utils import formats
 
 from .common import CommonInfo
 from .location import Location
-from .mentor import Mentor
+
+User = get_user_model()
 
 
 class MeetingType(CommonInfo):
@@ -124,7 +127,9 @@ class Meeting(CommonInfo):
         return orders
 
     def get_current_mentors(self):
-        return Mentor.objects.filter(
+        mentor = User.objects.filter(role=CDCUser.MENTOR)
+
+        return mentor.objects.filter(
             id__in=MeetingOrder.objects.filter(is_active=True, meeting=self,).values(
                 "mentor__id",
             )
@@ -137,9 +142,10 @@ class Meeting(CommonInfo):
 
 
 class MeetingOrder(CommonInfo):
-    mentor = models.ForeignKey(
-        Mentor,
+    user = models.ForeignKey(
+        User,
         on_delete=models.CASCADE,
+        default=""
     )
     meeting = models.ForeignKey(
         Meeting,

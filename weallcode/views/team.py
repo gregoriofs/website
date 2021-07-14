@@ -1,3 +1,4 @@
+from coderdojochi.models.user import CDCUser
 from collections import defaultdict
 from itertools import chain
 
@@ -5,13 +6,14 @@ from django.db.models.aggregates import Count
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView
 
-from coderdojochi.models import Mentor
+
 from weallcode.models.associate_board_member import AssociateBoardMember
 from weallcode.models.board_member import BoardMember
 from weallcode.models.staff import StaffMember
 
 from .common import DefaultMetaTags
-
+from django.contrib.auth import get_user_model
+User = get_user_model()
 
 class TeamView(DefaultMetaTags, TemplateView):
     template_name = "weallcode/team.html"
@@ -52,7 +54,8 @@ class TeamView(DefaultMetaTags, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        volunteers = Mentor.objects.select_related("user").filter(
+        volunteers = User.objects.select_related("user").filter(
+            role = CDCUser.MENTOR,
             is_active=True,
             is_public=True,
             background_check=True,

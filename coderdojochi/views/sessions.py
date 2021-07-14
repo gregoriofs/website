@@ -1,3 +1,4 @@
+from coderdojochi.models.user import CDCUser
 import logging
 
 from django.conf import settings
@@ -15,9 +16,10 @@ from django.views.generic.base import RedirectView
 import arrow
 
 from coderdojochi.mixins import RoleRedirectMixin, RoleTemplateMixin
-from coderdojochi.models import Guardian, Mentor, MentorOrder, Order, PartnerPasswordAccess, Session, Student, guardian
+from coderdojochi.models import Guardian, MentorOrder, Order, PartnerPasswordAccess, Session, Student, guardian
 from coderdojochi.util import email
-
+from django.contrib.auth import get_user_model
+User = get_user_model()
 from . import guardian, mentor, public
 from .calendar import CalendarView
 
@@ -251,7 +253,7 @@ class SessionSignUpView(RoleRedirectMixin, RoleTemplateMixin, TemplateView):
 
         if request.user.role == "mentor":
             session_orders = MentorOrder.objects.filter(session=session_obj, is_active=True)
-            kwargs["mentor"] = get_object_or_404(Mentor, user=request.user)
+            kwargs["mentor"] = get_object_or_404(User, user=request.user,role = CDCUser.MENTOR)
             kwargs["user_signed_up"] = session_orders.filter(mentor=kwargs["mentor"]).exists()
 
         elif request.user.role == "guardian":
@@ -444,7 +446,7 @@ class SessionCalendarView(CalendarView):
         if event_obj.online_video_link and self.request.user.is_authenticated:
             if self.request.user.role == "mentor":
                 try:
-                    mentor = Mentor.objects.get(user=self.request.user)
+                    mentor = User.objects.get(user=self.request.user,role = CDCUser.MENTOR)
                     mentor_signed_up = MentorOrder.objects.filter(
                         session=event_obj, is_active=True, mentor=mentor
                     ).exists()
@@ -452,7 +454,7 @@ class SessionCalendarView(CalendarView):
                     if mentor_signed_up:
                         location = event_obj.online_video_link
 
-                except Mentor.DoesNotExist:
+                except User.DoesNotExist:
                     pass
 
             elif self.request.user.role == "guardian":

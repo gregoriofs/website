@@ -22,7 +22,6 @@ from .models import (
     Meeting,
     MeetingOrder,
     MeetingType,
-    Mentor,
     MentorOrder,
     Order,
     RaceEthnicity,
@@ -100,98 +99,6 @@ class UserAdmin(ImportExportActionModelAdmin):
 
     role_link.short_description = "Role"
 
-
-@admin.register(Mentor)
-class MentorAdmin(ImportExportMixin, ImportExportActionModelAdmin):
-    list_per_page = 50
-
-    list_display = [
-        "first_name",
-        "last_name",
-        "user_link",
-        "mentor_count_link",
-        "created_at",
-        "updated_at",
-        "is_active",
-        "is_public",
-        "background_check",
-        "avatar_approved",
-    ]
-
-    list_filter = [
-        "is_active",
-        "is_public",
-        "background_check",
-        "avatar_approved",
-    ]
-
-    list_select_related = [
-        "user",
-    ]
-
-    ordering = [
-        "-created_at",
-    ]
-
-    date_hierarchy = "created_at"
-
-    search_fields = [
-        "user__first_name",
-        "user__last_name",
-        "user__username",
-        "user__email",
-    ]
-
-    readonly_fields = [
-        "mentor_count_link",
-    ]
-
-    autocomplete_fields = [
-        "user",
-    ]
-
-    filter_horizontal = [
-        "race_ethnicity",
-    ]
-
-    def view_on_site(self, obj):
-        return obj.get_absolute_url()
-
-    def get_queryset(self, request):
-        qs = super(MentorAdmin, self).get_queryset(request)
-
-        # Count all orders that are marked as active
-        qs = qs.annotate(
-            mentororder__count=Count(
-                Case(
-                    When(
-                        mentororder__is_active=True,
-                        then=1,
-                    )
-                )
-            )
-        )
-        return qs
-
-    def mentor_count_link(self, obj):
-        return format_html(
-            '<a href="{url}?mentor={query}">{count}</a>',
-            url=reverse("admin:coderdojochi_mentororder_changelist"),
-            query=obj.id,
-            count=obj.mentororder__count,
-        )
-
-    mentor_count_link.short_description = "Orders"
-    mentor_count_link.admin_order_field = "mentororder__count"
-
-    def user_link(self, obj):
-        return format_html(
-            '<a href="{url}">{user}</a>',
-            url=reverse("admin:coderdojochi_cdcuser_change", args=(obj.user.id,)),
-            user=obj.user,
-        )
-
-    user_link.short_description = "User"
 
 
 class GuardianImportResource(resources.ModelResource):
@@ -780,7 +687,7 @@ class MentorOrderAdmin(ImportExportMixin, ImportExportActionModelAdmin):
     list_per_page = 50
 
     list_display = [
-        "mentor",
+        "user",
         "session",
         "ip",
         "is_checked_in",
@@ -792,7 +699,7 @@ class MentorOrderAdmin(ImportExportMixin, ImportExportActionModelAdmin):
     ]
 
     list_display_links = [
-        "mentor",
+        "user",
     ]
 
     list_filter = [
@@ -802,7 +709,7 @@ class MentorOrderAdmin(ImportExportMixin, ImportExportActionModelAdmin):
     ]
 
     list_select_related = [
-        "mentor",
+        "user",
         "session",
     ]
 
@@ -816,7 +723,7 @@ class MentorOrderAdmin(ImportExportMixin, ImportExportActionModelAdmin):
     ]
 
     autocomplete_fields = [
-        "mentor",
+        "user",
         "session",
     ]
 
@@ -852,7 +759,7 @@ class MeetingOrderAdmin(ImportExportMixin, ImportExportActionModelAdmin):
     list_per_page = 50
 
     list_display = [
-        "mentor",
+        "user",
         "meeting",
         "ip",
         "is_checked_in",
@@ -885,7 +792,7 @@ class MeetingOrderAdmin(ImportExportMixin, ImportExportActionModelAdmin):
     ]
 
     autocomplete_fields = [
-        "mentor",
+        "user",
         "meeting",
     ]
 

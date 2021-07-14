@@ -1,3 +1,5 @@
+from coderdojochi.models import user
+from coderdojochi.models.user import CDCUser
 import logging
 
 from django.conf import settings
@@ -11,9 +13,11 @@ from django.views.generic import DetailView, ListView
 
 import arrow
 
-from coderdojochi.models import Meeting, MeetingOrder, Mentor
+from coderdojochi.models import Meeting, MeetingOrder
 from coderdojochi.util import email
 from coderdojochi.views.calendar import CalendarView
+from django.contrib.auth import get_user_model
+User = get_user_model()
 
 logger = logging.getLogger(__name__)
 
@@ -67,7 +71,7 @@ class MeetingDetailView(DetailView):
         user = self.request.user
 
         if user.is_authenticated and user.role == "mentor":
-            mentor = get_object_or_404(Mentor, user=self.request.user)
+            mentor = get_object_or_404(User, user=self.request.user,role=CDCUser.MENTOR)
 
             active_meeting_orders = MeetingOrder.objects.filter(meeting=self.object, is_active=True)
             context["active_meeting_orders"] = active_meeting_orders
@@ -106,7 +110,7 @@ class MeetingCalendarView(CalendarView):
 def meeting_sign_up(request, pk, template_name="meeting_sign_up.html"):
     meeting_obj = get_object_or_404(Meeting, pk=pk)
 
-    mentor = get_object_or_404(Mentor, user=request.user)
+    mentor = get_object_or_404(User, user=request.user,role=CDCUser.MENTOR)
 
     meeting_orders = MeetingOrder.objects.filter(meeting=meeting_obj, is_active=True)
 
@@ -200,7 +204,8 @@ def meeting_announce(request, pk):
             "meeting_calendar_url": f"{settings.SITE_URL}{meeting_obj.get_calendar_url()}",
         }
 
-        mentors = Mentor.objects.filter(
+        mentors = User.objects.filter(
+            role=CDCUser.MENTOR,
             is_active=True,
             user__is_active=True,
         )

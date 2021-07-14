@@ -13,7 +13,9 @@ from django.utils.text import format_lazy
 import html5.forms.widgets as html5_widgets
 from dateutil.relativedelta import relativedelta
 
-from coderdojochi.models import CDCUser, Donation, Guardian, Mentor, RaceEthnicity, Session, Student
+from coderdojochi.models import CDCUser, Donation, Guardian, RaceEthnicity, Session, Student
+
+User = get_user_model()
 
 
 class CDCForm(Form):
@@ -125,7 +127,7 @@ class MentorForm(CDCModelForm):
     )
 
     class Meta:
-        model = Mentor
+        model = CDCUser
         fields = ("bio", "avatar", "gender", "race_ethnicity", "birthday", "phone", "home_address", "work_place")
 
     def clean_avatar(self):

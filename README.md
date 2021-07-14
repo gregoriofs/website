@@ -104,7 +104,11 @@ docker-compose run --rm app python manage.py migrate
 - Cleaning up the docker containers:
 
 ```console
-docker kill $(docker ps -q); docker-compose rm -f; docker volume rm $(docker volume ls -qf dangling=true);
+docker kill $(docker ps -q); docker-compose rm -f; docker volume rm $(docker volume ls -qf dangling=true); 
+```
+
+```
+docker kill $(docker ps -q); docker-compose rm -f; docker volume rm $(docker volume ls -qf dangling=true); docker-compose run --rm app python manage.py makemigrations
 ```
 
 - Rebuild docker containers after major changes:

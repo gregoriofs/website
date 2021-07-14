@@ -1,3 +1,4 @@
+from coderdojochi.models.user import CDCUser
 from email.mime.image import MIMEImage
 
 from django.conf import settings
@@ -5,15 +6,20 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
 
-from coderdojochi.models import Mentor
+from django.contrib.auth import get_user_model
+User = get_user_model()
+
 from coderdojochi.util import email
 
 
-@receiver(pre_save, sender=Mentor)
+@receiver(pre_save, sender=User)
 def avatar_updated_handler(sender, instance, **kwargs):
 
+    if User.role != CDCUser.MENTOR:
+        return
+
     try:
-        original_mentor = Mentor.objects.get(id=instance.id)
+        original_mentor = User.objects.get(role=CDCUser.MENTOR,id=instance.id)
     except ObjectDoesNotExist:
         return
 

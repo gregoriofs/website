@@ -1,17 +1,25 @@
 import os
 
+from django.contrib.auth import get_user_model
 from django.db import models
+
+from coderdojochi.models.user import CDCUser
 
 from ..notifications import NewMentorOrderNotification
 from .common import CommonInfo
 
+User = get_user_model()
+
 
 class MentorOrder(CommonInfo):
-    from .mentor import Mentor
+
     from .session import Session
 
-    mentor = models.ForeignKey(
-        Mentor,
+    user = models.ForeignKey(
+        User,
+        limit_choices_to={
+            "user__role": CDCUser.MENTOR,
+        },
         on_delete=models.CASCADE,
     )
     session = models.ForeignKey(
