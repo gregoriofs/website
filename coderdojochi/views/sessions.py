@@ -1,3 +1,4 @@
+from coderdojochi.models.user import CDCUser
 import logging
 
 from django.conf import settings
@@ -5,6 +6,7 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
+from django.test.testcases import CheckCondition
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.decorators import method_decorator
@@ -15,10 +17,11 @@ from django.views.generic.base import RedirectView
 import arrow
 
 from coderdojochi.mixins import RoleRedirectMixin, RoleTemplateMixin
-from coderdojochi.models import Guardian, Mentor, MentorOrder, Order, PartnerPasswordAccess, Session, Student, guardian
+from coderdojochi.models import Guardian, MentorOrder, Order, PartnerPasswordAccess, Session, Student, guardian
+#removed Mentor
 from coderdojochi.util import email
 
-from . import guardian, mentor, public
+from . import guardian, public
 from .calendar import CalendarView
 
 logger = logging.getLogger(__name__)
@@ -111,7 +114,7 @@ class SessionDetailView(View):
 
         if request.user.is_authenticated:
             if request.user.role == "mentor":
-                return mentor.SessionDetailView.as_view()(request, *args, **kwargs)
+                return CDCUser.SessionDetailView.as_view()(request, *args, **kwargs)
             else:
                 return guardian.SessionDetailView.as_view()(request, *args, **kwargs)
         return public.SessionDetailView.as_view()(request, *args, **kwargs)
@@ -251,7 +254,7 @@ class SessionSignUpView(RoleRedirectMixin, RoleTemplateMixin, TemplateView):
 
         if request.user.role == "mentor":
             session_orders = MentorOrder.objects.filter(session=session_obj, is_active=True)
-            kwargs["mentor"] = get_object_or_404(Mentor, user=request.user)
+            kwargs["mentor"] = get_object_or_404(CDCUser, user=request.user)
             kwargs["user_signed_up"] = session_orders.filter(mentor=kwargs["mentor"]).exists()
 
         elif request.user.role == "guardian":
@@ -444,7 +447,7 @@ class SessionCalendarView(CalendarView):
         if event_obj.online_video_link and self.request.user.is_authenticated:
             if self.request.user.role == "mentor":
                 try:
-                    mentor = Mentor.objects.get(user=self.request.user)
+                    mentor = CDCUser.objects.get(user=self.request.user,role="mentor")
                     mentor_signed_up = MentorOrder.objects.filter(
                         session=event_obj, is_active=True, mentor=mentor
                     ).exists()
@@ -452,7 +455,7 @@ class SessionCalendarView(CalendarView):
                     if mentor_signed_up:
                         location = event_obj.online_video_link
 
-                except Mentor.DoesNotExist:
+                except CDCUser.DoesNotExist:
                     pass
 
             elif self.request.user.role == "guardian":

@@ -1,3 +1,4 @@
+from coderdojochi.models.user import CDCUser
 from datetime import timedelta
 
 from django.core.validators import MaxValueValidator, MinValueValidator
@@ -11,7 +12,7 @@ from .common import CommonInfo
 class Session(salesforce.models.SalesforceModel):
     from .course import Course
     from .location import Location
-    from .mentor import Mentor
+    # from .mentor import Mentor
     from .student import Student
 
     MALE = "male"
@@ -49,7 +50,7 @@ class Session(salesforce.models.SalesforceModel):
         default=10,
     )
     instructor = salesforce.models.ForeignKey(
-        Mentor,
+        CDCUser,
         on_delete=salesforce.models.PROTECT,
         related_name="session_instructor",
         limit_choices_to={
@@ -64,7 +65,7 @@ class Session(salesforce.models.SalesforceModel):
     )
 
     assistant = salesforce.models.ForeignKey(
-        Mentor,
+        CDCUser,
         blank=True,
         null=True,
         related_name="session_assistant",

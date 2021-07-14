@@ -5,15 +5,15 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
 
-from coderdojochi.models import Mentor
+# from coderdojochi.models import Mentor
 from coderdojochi.util import email
+from coderdojochi.models import CDCUser
 
-
-@receiver(pre_save, sender=Mentor)
+@receiver(pre_save, sender=CDCUser)
 def avatar_updated_handler(sender, instance, **kwargs):
 
     try:
-        original_mentor = Mentor.objects.get(id=instance.id)
+        original_mentor = CDCUser.objects.get(id=instance.id)
     except ObjectDoesNotExist:
         return
 

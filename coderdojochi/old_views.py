@@ -27,11 +27,12 @@ from coderdojochi.models import (
     Guardian,
     Meeting,
     MeetingOrder,
-    Mentor,
+    # Mentor,
     MentorOrder,
     Order,
     Session,
     Student,
+    CDCUser,
 )
 from coderdojochi.util import email
 
@@ -57,7 +58,7 @@ def home(request, template_name="home.html"):
 
 def volunteer(request, template_name="volunteer.html"):
     mentors = (
-        Mentor.objects.select_related("user")
+        CDCUser.objects.select_related("user")
         .filter(
             is_active=True,
             is_public=True,
@@ -77,7 +78,7 @@ def volunteer(request, template_name="volunteer.html"):
 
 @login_required
 def mentor_approve_avatar(request, pk=None):
-    mentor = get_object_or_404(Mentor, id=pk)
+    mentor = get_object_or_404(CDCUser, id=pk)
 
     if not request.user.is_staff:
         messages.error(request, "You do not have permissions to moderate content.")
@@ -106,7 +107,7 @@ def mentor_approve_avatar(request, pk=None):
 
 @login_required
 def mentor_reject_avatar(request, pk=None):
-    mentor = get_object_or_404(Mentor, id=pk)
+    mentor = get_object_or_404(CDCUser, id=pk)
 
     if not request.user.is_staff:
         messages.error(request, "You do not have permissions to moderate content.")

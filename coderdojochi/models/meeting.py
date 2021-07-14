@@ -6,8 +6,8 @@ import salesforce
 
 from .common import CommonInfo
 from .location import Location
-from .mentor import Mentor
-
+# from .mentor import Mentor
+from .user import CDCUser
 
 class MeetingType(salesforce.models.SalesforceModel):
     # class MeetingType(CommonInfo):
@@ -148,7 +148,7 @@ class Meeting(salesforce.models.SalesforceModel):
         return orders
 
     def get_current_mentors(self):
-        return Mentor.objects.filter(
+        return CDCUser.objects.filter(
             id__in=MeetingOrder.objects.filter(is_active=True, meeting=self,).values(
                 "mentor__id",
             )
@@ -164,7 +164,7 @@ class MeetingOrder(salesforce.models.SalesforceModel):
 #class MeetingOrder(CommonInfo):
 
     mentor = salesforce.models.ForeignKey(
-        Mentor,
+        CDCUser,
         on_delete=salesforce.models.PROTECT,
         db_column="Mentor__c"
     )

@@ -1,3 +1,4 @@
+from coderdojochi.models.user import CDCUser
 import logging
 
 from django.conf import settings
@@ -11,7 +12,8 @@ from django.views.generic import DetailView, ListView
 
 import arrow
 
-from coderdojochi.models import Meeting, MeetingOrder, Mentor
+from coderdojochi.models import Meeting, MeetingOrder
+#removed Mentor from imports
 from coderdojochi.util import email
 from coderdojochi.views.calendar import CalendarView
 
@@ -200,7 +202,8 @@ def meeting_announce(request, pk):
             "meeting_calendar_url": f"{settings.SITE_URL}{meeting_obj.get_calendar_url()}",
         }
 
-        mentors = Mentor.objects.filter(
+        mentors = CDCUser.objects.filter(
+            role="mentor",
             is_active=True,
             user__is_active=True,
         )

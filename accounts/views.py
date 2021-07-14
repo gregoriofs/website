@@ -11,8 +11,8 @@ from allauth.account.views import SignupView as AllAuthSignupView
 from meta.views import MetadataMixin
 
 from coderdojochi.forms import CDCModelForm, GuardianForm, MentorForm
-from coderdojochi.models import Guardian, MeetingOrder, Mentor, MentorOrder, Order, Student
-
+from coderdojochi.models import Guardian, MeetingOrder, MentorOrder, Order, Student, CDCUser
+# Removed Mentor from Models import
 
 class SignupView(MetadataMixin, AllAuthSignupView):
     template_name = "account/signup.html"
@@ -76,7 +76,7 @@ class AccountHomeView(MetadataMixin, TemplateView):
         return context
 
     def get_context_data_for_mentor(self):
-        mentor = get_object_or_404(Mentor, user=self.request.user)
+        mentor = get_object_or_404(CDCUser, user=self.request.user)
 
         orders = MentorOrder.objects.select_related().filter(
             is_active=True,

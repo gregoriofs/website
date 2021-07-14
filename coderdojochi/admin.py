@@ -22,7 +22,7 @@ from .models import (
     Meeting,
     MeetingOrder,
     MeetingType,
-    Mentor,
+    # Mentor,
     MentorOrder,
     Order,
     RaceEthnicity,
@@ -101,7 +101,7 @@ class UserAdmin(ImportExportActionModelAdmin):
     role_link.short_description = "Role"
 
 
-@admin.register(Mentor)
+# @admin.register(Mentor)
 class MentorAdmin(ImportExportMixin, ImportExportActionModelAdmin):
     list_per_page = 50
 

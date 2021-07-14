@@ -1,3 +1,4 @@
+from coderdojochi.models.user import CDCUser
 import os
 
 #from django.db import models
@@ -8,7 +9,7 @@ import salesforce
 
 class MentorOrder(salesforce.models.SalesforceModel):
     #class MentorOrder(CommonInfo):
-    from .mentor import Mentor
+    # from .mentor import Mentor
     from .session import Session
 
     CURRENT = "current"
@@ -20,7 +21,7 @@ class MentorOrder(salesforce.models.SalesforceModel):
     ]
 
     mentor = salesforce.models.ForeignKey(
-        Mentor,
+        CDCUser,
         on_delete=salesforce.models.PROTECT,
         db_column="hed__Contact__c",
     )

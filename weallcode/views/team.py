@@ -5,7 +5,8 @@ from django.db.models.aggregates import Count
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView
 
-from coderdojochi.models import Mentor
+from coderdojochi.models import CDCUser
+#removed Mentor
 from weallcode.models.associate_board_member import AssociateBoardMember
 from weallcode.models.board_member import BoardMember
 from weallcode.models.staff import StaffMember
@@ -52,11 +53,12 @@ class TeamView(DefaultMetaTags, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        volunteers = Mentor.objects.select_related("user").filter(
+        volunteers = CDCUser.objects.select_related("user").filter(
             is_active=True,
             is_public=True,
             background_check=True,
             avatar_approved=True,
+            role="mentor"
         )
 
         context["staff"] = StaffMember.objects.get_sorted()

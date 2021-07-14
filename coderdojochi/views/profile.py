@@ -1,3 +1,4 @@
+from coderdojochi.models.user import CDCUser
 import logging
 
 from django.contrib import messages
@@ -9,8 +10,8 @@ from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView
 
 from coderdojochi.forms import CDCModelForm, MentorForm
-from coderdojochi.models import Mentor, MentorOrder
-
+from coderdojochi.models import MentorOrder
+#removed Mentor from imports
 logger = logging.getLogger(__name__)
 
 # this will assign User to our custom CDCUser
@@ -27,7 +28,7 @@ class DojoMentorView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(DojoMentorView, self).get_context_data(**kwargs)
         context["highlight"] = self.request.GET.get("highlight", False)
-        mentor = get_object_or_404(Mentor, user=self.request.user)
+        mentor = get_object_or_404(CDCUser, user=self.request.user ,role="mentor")
         context["mentor"] = mentor
 
         orders = MentorOrder.objects.select_related().filter(
@@ -62,7 +63,7 @@ class DojoMentorView(TemplateView):
         return context
 
     def post(self, request, *args, **kwargs):
-        mentor = get_object_or_404(Mentor, user=request.user)
+        mentor = get_object_or_404(CDCUser, user=request.user)
 
         form = MentorForm(request.POST, request.FILES, instance=mentor)
 

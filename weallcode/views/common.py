@@ -13,8 +13,8 @@ from django.views.generic import FormView, TemplateView
 from meta.views import MetadataMixin
 from sentry_sdk import capture_message
 
-from coderdojochi.models import Course, Mentor, Session
-
+from coderdojochi.models import Course, Session
+#removed mentor
 from ..forms import ContactForm
 from ..models import AssociateBoardMember, BoardMember, StaffMember
 

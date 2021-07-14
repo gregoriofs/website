@@ -9,7 +9,8 @@ from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView
 
 from coderdojochi.forms import GuardianForm, MentorForm, StudentForm
-from coderdojochi.models import Guardian, Meeting, Mentor, Session
+from coderdojochi.models import Guardian, Meeting, Session, CDCUser
+#Removed Mentor
 from coderdojochi.util import email
 
 logger = logging.getLogger(__name__)
@@ -24,7 +25,7 @@ class WelcomeView(TemplateView):
         kwargs["next_url"] = next_url
         # Check for redirect condition on mentor, otherwise pass as kwarg
         if getattr(request.user, "role", False) == "mentor" and request.method == "GET":
-            mentor = get_object_or_404(Mentor, user=request.user)
+            mentor = get_object_or_404(CDCUser, user=request.user,role="mentor")
 
             if mentor.first_name:
                 if next_url:
@@ -71,7 +72,7 @@ class WelcomeView(TemplateView):
 
         if role:
             if role == "mentor":
-                account = get_object_or_404(Mentor, user=user)
+                account = get_object_or_404(CDCUser, user=user)
                 return self.update_account(request, account, next_url)
             account = get_object_or_404(Guardian, user=user)
 
@@ -83,7 +84,7 @@ class WelcomeView(TemplateView):
             return self.create_new_user(request, user, next_url)
 
     def update_account(self, request, account, next_url):
-        if isinstance(account, Mentor):
+        if isinstance(account, CDCUser):
             form = MentorForm(request.POST, instance=account)
             role = "mentor"
         else:
@@ -96,7 +97,7 @@ class WelcomeView(TemplateView):
                 if "enroll" in request.GET:
                     next_url = f"{next_url}?enroll=True"
             else:
-                if isinstance(account, Mentor):
+                if isinstance(account, CDCUser) and account.role == "mentor":
                     next_url = "account_home"
                 else:
                     next_url = "welcome"
@@ -129,7 +130,7 @@ class WelcomeView(TemplateView):
     def create_new_user(self, request, user, next_url):
         if request.POST.get("role") == "mentor":
             role = "mentor"
-            account, created = Mentor.objects.get_or_create(user=user)
+            account, created = CDCUser.objects.get_or_create(user=user)
         else:
             role = "guardian"
             account, created = Guardian.objects.get_or_create(user=user)
