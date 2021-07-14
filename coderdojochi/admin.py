@@ -859,8 +859,8 @@ class MeetingOrderAdmin(ImportExportMixin, ImportExportActionModelAdmin):
         "is_active",
         "week_reminder_sent",
         "day_reminder_sent",
-        "created_at",
-        "updated_at",
+        # "created_at",
+        # "updated_at",
     ]
 
     list_filter = [
@@ -876,7 +876,7 @@ class MeetingOrderAdmin(ImportExportMixin, ImportExportActionModelAdmin):
     ]
 
     ordering = [
-        "created_at",
+        # "created_at",
     ]
 
     search_fields = [
@@ -894,7 +894,7 @@ class MeetingOrderAdmin(ImportExportMixin, ImportExportActionModelAdmin):
         meeting_order_check_out,
     ]
 
-    date_hierarchy = "created_at"
+    # date_hierarchy = "created_at"
 
     view_on_site = False
 
@@ -906,7 +906,7 @@ class MeetingTypeAdmin(ImportExportMixin, ImportExportActionModelAdmin):
     list_display = [
         "code",
         "title",
-        "slug",
+        # "slug",
     ]
 
     list_display_links = [
@@ -919,7 +919,7 @@ class MeetingTypeAdmin(ImportExportMixin, ImportExportActionModelAdmin):
     ]
 
     prepopulated_fields = {
-        "slug": ("title",),
+        # "slug": ("title",),
     }
 
     view_on_site = False
@@ -937,7 +937,7 @@ class MeetingAdmin(ImportExportMixin, ImportExportActionModelAdmin):
         "get_mentor_count",
         "is_public",
         "announced_date",
-        "created_at",
+        # "created_at",
     ]
 
     list_filter = [
@@ -1028,7 +1028,7 @@ class DonationAdmin(ImportExportMixin, ImportExportActionModelAdmin):
         "amount",
         "is_verified",
         "receipt_sent",
-        "created_at",
+        # "created_at",
     ]
 
     list_filter = [
@@ -1037,11 +1037,11 @@ class DonationAdmin(ImportExportMixin, ImportExportActionModelAdmin):
         "is_verified",
         "receipt_sent",
         "amount",
-        "created_at",
+        # "created_at",
     ]
 
     ordering = [
-        "-created_at",
+        # "-created_at",
     ]
 
     search_fields = [
@@ -1051,7 +1051,7 @@ class DonationAdmin(ImportExportMixin, ImportExportActionModelAdmin):
         "session",
     ]
 
-    date_hierarchy = "created_at"
+    # date_hierarchy = "created_at"
 
     autocomplete_fields = [
         "user",
