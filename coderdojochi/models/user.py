@@ -40,8 +40,7 @@ class CDCUser(AbstractUser):
     role = models.CharField(
         choices=ROLE_CHOICES,
         max_length=10,
-        blank=True,
-        null=True,
+    
     )
 
     admin_notes = models.TextField(
@@ -84,6 +83,13 @@ class CDCUser(AbstractUser):
         default="",
     )
 
+    phone = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        # db_column="Phone",
+    )
+
     # Mentor-specific
 
     bio = models.TextField(
@@ -108,10 +114,13 @@ class CDCUser(AbstractUser):
                 "crop": True,
             },
         },
+        null=True,
     )
 
     avatar_approved = models.BooleanField(
         default=False,
+        blank=True,
+        null=True,
     )
 
     work_place = models.CharField(
@@ -121,19 +130,34 @@ class CDCUser(AbstractUser):
         # db_column="GW_Volunteers__Volunteer_Organization__c",
     )
 
-    phone = models.CharField(
-        max_length=255,
-        blank=True,
-        null=True,
-        # db_column="Phone",
-    )
-
     home_address = models.CharField(
         max_length=255,
         blank=True,
         null=True,
         # db_column="npe01__Home_Address__c",
     )
+    # Guardian 
+    
+    zip = models.CharField(
+        max_length=20,
+        blank=True,
+        null=True,
+    )
+
+    def __str__(self):
+        return self.full_name
+
+    @property
+    def email(self):
+        return self.user.email
+
+    def get_students(self):
+        from .student import Student
+
+        return Student.objects.filter(
+            guardian=self,
+            is_active=True,
+        )
 
     class Meta:
         pass
@@ -143,40 +167,39 @@ class CDCUser(AbstractUser):
     def name(self):
         return f"{self.first_name} {self.last_name}"
 
-    # def get_absolute_url(self):
-    #     return reverse("account_home")
+    def get_absolute_url(self):
+        return reverse("account_home")
 
     # @property
     # def first_name(self):
-    #     return self.user.first_name
+    #     return self.first_name
 
     # @property
     # def last_name(self):
-    #     return self.user.last_name
+    #     return self.last_name
 
     @property
     def full_name(self):
         return f"{self.first_name} {self.last_name}"
 
-    # @property
-    # def email(self):
-    #     return self.email
+    @property
+    def email(self):
+        return self.email
 
     def save(self, *args, **kwargs):
         if self.pk is None:
             self.last_login = timezone.now()
 
-        if self.pk is None and self.role == MENTOR:
+        if self.pk is None and self.role == CDCUser.MENTOR:
             NewMentorNotification(self).send()
         else:
-            pass
             # FIXME: Update this to match
-            # orig = CDCUser.objects.get(pk=self.pk)
-            # if orig.avatar != self.avatar:
-            #     self.avatar_approved = False
+            orig = CDCUser.objects.get(pk=self.pk, role = CDCUser.MENTOR)
+            if orig.avatar != self.avatar:
+                self.avatar_approved = False
 
-            # if self.background_check is True and orig.background_check != self.background_check:
-            #     NewMentorBgCheckNotification(self).send()
+            if self.background_check is True and orig.background_check != self.background_check:
+                NewMentorBgCheckNotification(self).send()
 
         super(CDCUser, self).save(*args, **kwargs)
 

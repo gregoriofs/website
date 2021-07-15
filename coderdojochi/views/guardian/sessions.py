@@ -1,8 +1,9 @@
+from coderdojochi.old_views import cdc_admin
 from coderdojochi.models.user import CDCUser
 from django.shortcuts import get_object_or_404
 from django.views.generic import DetailView
 
-from ...models import Guardian, MentorOrder, Session
+from ...models import MentorOrder, Session
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
@@ -11,7 +12,7 @@ class SessionDetailView(DetailView):
     template_name = "guardian/session_detail.html"
 
     def get_context_data(self, **kwargs):
-        guardian = get_object_or_404(Guardian, user=self.request.user)
+        guardian = get_object_or_404(User, user=self.request.user,role=CDCUser.GUARDIAN)
 
         context = super().get_context_data(**kwargs)
         context["students"] = guardian.get_students()

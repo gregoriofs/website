@@ -13,7 +13,7 @@ from django.utils.text import format_lazy
 import html5.forms.widgets as html5_widgets
 from dateutil.relativedelta import relativedelta
 
-from coderdojochi.models import CDCUser, Donation, Guardian, RaceEthnicity, Session, Student
+from coderdojochi.models import CDCUser, Donation, RaceEthnicity, Session, Student
 
 User = get_user_model()
 
@@ -186,7 +186,7 @@ class GuardianForm(CDCModelForm):
     birthday = forms.CharField(widget=html5_widgets.DateInput(attrs={"class": "form-control"}), required=True)
 
     class Meta:
-        model = Guardian
+        model = CDCUser
         fields = ("phone", "zip", "gender", "race_ethnicity", "birthday")
 
 

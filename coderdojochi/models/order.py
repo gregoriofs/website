@@ -4,12 +4,17 @@ from .common import CommonInfo
 
 
 class Order(CommonInfo):
-    from .guardian import Guardian
+    from django.contrib.auth import get_user_model
     from .session import Session
     from .student import Student
+    from .user import CDCUser
+    User = get_user_model()
 
     guardian = models.ForeignKey(
-        Guardian,
+        User,
+        limit_choices_to={
+            "user__role": CDCUser.GUARDIAN
+        },
         on_delete=models.CASCADE,
     )
     session = models.ForeignKey(

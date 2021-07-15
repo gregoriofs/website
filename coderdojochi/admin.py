@@ -1,3 +1,4 @@
+from coderdojochi.models.user import CDCUser
 from datetime import datetime
 from distutils.util import strtobool
 
@@ -17,7 +18,6 @@ from .models import (
     Donation,
     Equipment,
     EquipmentType,
-    Guardian,
     Location,
     Meeting,
     MeetingOrder,
@@ -115,9 +115,9 @@ class GuardianImportResource(resources.ModelResource):
         try:
             instance = User.objects.get(email=row["email"])
         except User.DoesNotExist:
-            return Guardian(user=User()), True
+            return User(user=User(), role=CDCUser.GUARDIAN), True
         else:
-            return (Guardian.objects.get(user=instance), False)
+            return (User.objects.get(user=instance,role=CDCUser.GUARDIAN), False)
 
     def import_obj(self, obj, data, dry_run):
         if obj.pk:
@@ -141,7 +141,7 @@ class GuardianImportResource(resources.ModelResource):
             obj.save()
 
     class Meta:
-        model = Guardian
+        model = CDCUser
         import_id_fields = [
             "phone",
         ]
@@ -149,81 +149,6 @@ class GuardianImportResource(resources.ModelResource):
             "phone",
             "zip",
         ]
-
-
-@admin.register(Guardian)
-class GuardianAdmin(ImportExportMixin, ImportExportActionModelAdmin):
-    list_per_page = 10
-
-    list_display = [
-        "first_name",
-        "last_name",
-        "student_count_link",
-        "user_link",
-        "created_at",
-        "updated_at",
-    ]
-
-    list_filter = [
-        "zip",
-    ]
-
-    list_select_related = [
-        "user",
-    ]
-
-    search_fields = [
-        "user__first_name",
-        "user__last_name",
-        "user__username",
-        "user__email",
-        "phone",
-    ]
-
-    readonly_fields = [
-        "student_count_link",
-    ]
-
-    autocomplete_fields = [
-        "user",
-    ]
-
-    filter_horizontal = [
-        "race_ethnicity",
-    ]
-
-    date_hierarchy = "created_at"
-
-    view_on_site = False
-
-    # Import settings
-    resource_class = GuardianImportResource
-
-    def get_queryset(self, request):
-        qs = super(GuardianAdmin, self).get_queryset(request)
-        qs = qs.select_related()
-        qs = qs.annotate(student_count=Count("student")).order_by("-student_count")
-        return qs
-
-    def user_link(self, obj):
-        return format_html(
-            '<a href="{url}">{name}</a>',
-            url=reverse("admin:coderdojochi_cdcuser_change", args=(obj.user.id,)),
-            name=obj.user,
-        )
-
-    user_link.short_description = "User"
-
-    def student_count_link(self, obj):
-        return format_html(
-            '<a href="{url}?guardian={query}">{count}</a>',
-            url=reverse("admin:coderdojochi_student_changelist"),
-            query=obj.id,
-            count=obj.student_count,
-        )
-
-    student_count_link.short_description = "Students"
-    student_count_link.admin_order_field = "student_count"
 
 
 class StudentResource(resources.ModelResource):
@@ -278,8 +203,8 @@ class StudentResource(resources.ModelResource):
         obj.is_active = True
 
         try:
-            obj.guardian = Guardian.objects.get(user__email=guardian_email)
-        except Guardian.DoesNotExist:
+            obj.guardian = User.objects.get(user__email=guardian_email, user__role=CDCUser.GUARDIAN)
+        except User.DoesNotExist:
             raise ImportError(f"guardian with email {guardian_email} not found")
 
         if not dry_run:

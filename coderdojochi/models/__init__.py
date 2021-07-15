@@ -3,7 +3,6 @@ from .course import *
 from .donation import *
 from .email_content import *
 from .equipment import *
-from .guardian import *
 from .location import *
 from .meeting import *
 from .mentor_order import *

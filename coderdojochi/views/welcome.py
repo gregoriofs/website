@@ -10,7 +10,7 @@ from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView
 
 from coderdojochi.forms import GuardianForm, MentorForm, StudentForm
-from coderdojochi.models import Guardian, Meeting, Session
+from coderdojochi.models import Meeting, Session
 from coderdojochi.util import email
 from django.contrib.auth import get_user_model
 User = get_user_model()
@@ -52,7 +52,7 @@ class WelcomeView(TemplateView):
             account = mentor
             context["form"] = MentorForm(instance=account)
         if role == "guardian":
-            guardian = get_object_or_404(Guardian, user=user)
+            guardian = get_object_or_404(User, user=user,role=CDCUser.GUARDIAN)
             account = guardian
             if not account.phone or not account.zip:
                 context["form"] = GuardianForm(instance=account)
@@ -76,7 +76,7 @@ class WelcomeView(TemplateView):
             if role == "mentor":
                 account = get_object_or_404(User, user=user,role=CDCUser.MENTOR)
                 return self.update_account(request, account, next_url)
-            account = get_object_or_404(Guardian, user=user)
+            account = get_object_or_404(User, user=user,role=CDCUser.GUARDIAN)
 
             if not account.phone or not account.zip:
                 return self.update_account(request, account, next_url)
@@ -135,7 +135,7 @@ class WelcomeView(TemplateView):
             account, created = User.objects.get_or_create(user=user)
         else:
             role = "guardian"
-            account, created = Guardian.objects.get_or_create(user=user)
+            account, created = User.objects.get_or_create(user=user,role=CDCUser.GUARDIAN)
 
         account.user.first_name = user.first_name
         account.user.last_name = user.last_name

@@ -12,7 +12,7 @@ from allauth.account.views import SignupView as AllAuthSignupView
 from meta.views import MetadataMixin
 
 from coderdojochi.forms import CDCModelForm, GuardianForm, MentorForm
-from coderdojochi.models import CDCUser, Guardian, MeetingOrder, MentorOrder, Order, Student
+from coderdojochi.models import CDCUser, MeetingOrder, MentorOrder, Order, Student
 
 User = get_user_model()
 
@@ -124,7 +124,7 @@ class AccountHomeView(MetadataMixin, TemplateView):
         }
 
     def get_context_data_for_guardian(self):
-        guardian = get_object_or_404(Guardian, user=self.request.user)
+        guardian = get_object_or_404(User, user=self.request.user, role=CDCUser.GUARDIAN)
 
         students = Student.objects.filter(
             is_active=True,

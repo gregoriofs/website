@@ -16,7 +16,7 @@ from django.views.generic.base import RedirectView
 import arrow
 
 from coderdojochi.mixins import RoleRedirectMixin, RoleTemplateMixin
-from coderdojochi.models import Guardian, MentorOrder, Order, PartnerPasswordAccess, Session, Student, guardian
+from coderdojochi.models import MentorOrder, Order, PartnerPasswordAccess, Session, Student
 from coderdojochi.util import email
 from django.contrib.auth import get_user_model
 User = get_user_model()
@@ -257,7 +257,7 @@ class SessionSignUpView(RoleRedirectMixin, RoleTemplateMixin, TemplateView):
             kwargs["user_signed_up"] = session_orders.filter(mentor=kwargs["mentor"]).exists()
 
         elif request.user.role == "guardian":
-            kwargs["guardian"] = get_object_or_404(Guardian, user=request.user)
+            kwargs["guardian"] = get_object_or_404(User, user=request.user,role=CDCUser.GUARDIAN)
             kwargs["student"] = get_object_or_404(Student, id=kwargs["student_id"])
             kwargs["user_signed_up"] = kwargs["student"].is_registered_for_session(session_obj)
 
@@ -459,7 +459,7 @@ class SessionCalendarView(CalendarView):
 
             elif self.request.user.role == "guardian":
                 try:
-                    guardian = Guardian.objects.get(user=self.request.user)
+                    guardian = User.objects.get(user=self.request.user,role=CDCUser.GUARDIAN)
                     students = guardian.get_students()
                     students_signed_up = Order.objects.filter(
                         session=event_obj,
@@ -470,7 +470,7 @@ class SessionCalendarView(CalendarView):
                     if students_signed_up:
                         location = event_obj.online_video_link
 
-                except Guardian.DoesNotExist:
+                except User.DoesNotExist:
                     pass
 
         elif event_obj.location.address:

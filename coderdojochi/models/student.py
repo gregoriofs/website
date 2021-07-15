@@ -3,13 +3,18 @@ from django.utils import timezone
 
 from .common import CommonInfo
 from .race_ethnicity import RaceEthnicity
+from .user import CDCUser
+from django.contrib.auth import get_user_model
 
+User = get_user_model()
 
 class Student(CommonInfo):
-    from .guardian import Guardian
 
     guardian = models.ForeignKey(
-        Guardian,
+        User,
+        limit_choices_to={
+            "user__role":CDCUser.GUARDIAN,
+        },
         on_delete=models.CASCADE,
     )
     first_name = models.CharField(

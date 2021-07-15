@@ -28,7 +28,6 @@ from coderdojochi.models import (
     Donation,
     Equipment,
     EquipmentType,
-    Guardian,
     Meeting,
     MeetingOrder,
     MentorOrder,
@@ -149,7 +148,7 @@ def student_detail(request, student_id=False, template_name="student_detail.html
             return redirect("account_home")
 
         try:
-            guardian = Guardian.objects.get(user=request.user, is_active=True)
+            guardian = User.objects.get(user=request.user, is_active=True,role=CDCUser.GUARDIAN)
         except ObjectDoesNotExist:
             return redirect("account_home")
 
@@ -624,7 +623,8 @@ def session_announce_guardians(request, pk):
         }
         recipients = []
 
-        guardians = Guardian.objects.filter(
+        guardians = User.objects.filter(
+            role=CDCUser.GUARDIAN,
             is_active=True,
             user__is_active=True,
         )
