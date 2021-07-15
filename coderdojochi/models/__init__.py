@@ -9,5 +9,4 @@ from .mentor_order import *
 from .order import *
 from .race_ethnicity import *
 from .session import *
-from .student import *
 from .user import *

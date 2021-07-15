@@ -16,7 +16,7 @@ from django.views.generic.base import RedirectView
 import arrow
 
 from coderdojochi.mixins import RoleRedirectMixin, RoleTemplateMixin
-from coderdojochi.models import MentorOrder, Order, PartnerPasswordAccess, Session, Student
+from coderdojochi.models import MentorOrder, Order, PartnerPasswordAccess, Session
 from coderdojochi.util import email
 from django.contrib.auth import get_user_model
 User = get_user_model()
@@ -258,7 +258,7 @@ class SessionSignUpView(RoleRedirectMixin, RoleTemplateMixin, TemplateView):
 
         elif request.user.role == "guardian":
             kwargs["guardian"] = get_object_or_404(User, user=request.user,role=CDCUser.GUARDIAN)
-            kwargs["student"] = get_object_or_404(Student, id=kwargs["student_id"])
+            kwargs["student"] = get_object_or_404(User, id=kwargs["student_id"],role=CDCUser.STUDENT)
             kwargs["user_signed_up"] = kwargs["student"].is_registered_for_session(session_obj)
 
         access_dict = self.check_access(request, *args, **kwargs)

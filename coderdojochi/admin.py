@@ -26,7 +26,6 @@ from .models import (
     Order,
     RaceEthnicity,
     Session,
-    Student,
 )
 
 User = get_user_model()
@@ -211,104 +210,15 @@ class StudentResource(resources.ModelResource):
             obj.save()
 
     class Meta:
-        model = Student
-        import_id_fields = [
-            "first_name",
-            "last_name",
-        ]
-        fields = [
-            "first_name",
-            "last_name",
-        ]
-
-
-@admin.register(Student)
-class StudentAdmin(ImportExportMixin, ImportExportActionModelAdmin):
-    list_per_page = 10
-
-    list_display = [
-        "first_name",
-        "last_name",
-        "gender",
-        "get_clean_gender",
-        "guardian_link",
-        "order_count_link",
-        "get_age",
-        "is_active",
-    ]
-
-    list_filter = [
-        "gender",
-    ]
-
-    filter_horizontal = [
-        "race_ethnicity",
-    ]
-
-    ordering = [
-        "guardian",
-    ]
-
-    search_fields = [
-        "first_name",
-        "last_name",
-        "guardian__user__first_name",
-        "guardian__user__last_name",
-    ]
-
-    autocomplete_fields = [
-        "guardian",
-    ]
-
-    date_hierarchy = "created_at"
-
-    view_on_site = False
-
-    # Import settings
-    resource_class = StudentResource
-
-    readonly_fields = [
-        "guardian_link",
-        "order_count_link",
-    ]
-
-    def get_queryset(self, request):
-        qs = super(StudentAdmin, self).get_queryset(request)
-
-        qs = qs.select_related()
-
-        # Count all orders that are marked as active
-        qs = qs.annotate(
-            order__count=Count(
-                Case(
-                    When(
-                        order__is_active=True,
-                        then=1,
-                    )
-                )
-            )
-        )
-        return qs
-
-    def guardian_link(self, obj):
-        return format_html(
-            '<a href="{url}">{name}</a>',
-            url=reverse("admin:coderdojochi_guardian_change", args=(obj.guardian.id,)),
-            name=obj.guardian.full_name,
-        )
-
-    guardian_link.short_description = "Guardian"
-
-    def order_count_link(self, obj):
-        return format_html(
-            '<a href="{url}?student={student}">{count}</a>',
-            url=reverse("admin:coderdojochi_order_changelist"),
-            student=obj.id,
-            count=obj.order__count,
-        )
-
-    order_count_link.short_description = "Orders"
-    order_count_link.admin_order_field = "order__count"
+        model = CDCUser
+        # import_id_fields = [
+        #     "first_name",
+        #     "last_name",
+        # ]
+        # fields = [
+        #     "first_name",
+        #     "last_name",
+        # ]
 
 
 @admin.register(Course)

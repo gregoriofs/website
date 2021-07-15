@@ -13,7 +13,7 @@ from django.utils.text import format_lazy
 import html5.forms.widgets as html5_widgets
 from dateutil.relativedelta import relativedelta
 
-from coderdojochi.models import CDCUser, Donation, RaceEthnicity, Session, Student
+from coderdojochi.models import CDCUser, Donation, RaceEthnicity, Session
 
 User = get_user_model()
 
@@ -324,9 +324,9 @@ class StudentForm(CDCModelForm):
     )
 
     class Meta:
-        model = Student
-        exclude = ("guardian", "created_at", "updated_at", "is_active")
-
+        model = CDCUser
+        exclude = ("created_at", "updated_at", "is_active")
+                
 
 class ContactForm(CDCForm):
     name = forms.CharField(max_length=100, label="Your name")

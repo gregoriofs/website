@@ -33,7 +33,6 @@ from coderdojochi.models import (
     MentorOrder,
     Order,
     Session,
-    Student,
 )
 from coderdojochi.util import email
 
@@ -143,7 +142,7 @@ def student_detail(request, student_id=False, template_name="student_detail.html
     if request.user.role == "guardian" and student_id:
         # for the specific student redirect to admin page
         try:
-            student = Student.objects.get(id=student_id, is_active=True)
+            student = User.objects.get(id=student_id, is_active=True,role=CDCUser.STUDENT)
         except ObjectDoesNotExist:
             return redirect("account_home")
 

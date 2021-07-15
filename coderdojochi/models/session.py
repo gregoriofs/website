@@ -17,7 +17,6 @@ User = get_user_model()
 class Session(CommonInfo):
     from .course import Course
     from .location import Location
-    from .student import Student
 
     MALE = "male"
     FEMALE = "female"

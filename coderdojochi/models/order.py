@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models.fields import related
 
 from .common import CommonInfo
 
@@ -6,8 +7,8 @@ from .common import CommonInfo
 class Order(CommonInfo):
     from django.contrib.auth import get_user_model
     from .session import Session
-    from .student import Student
     from .user import CDCUser
+    
     User = get_user_model()
 
     guardian = models.ForeignKey(
@@ -15,6 +16,7 @@ class Order(CommonInfo):
         limit_choices_to={
             "user__role": CDCUser.GUARDIAN
         },
+        related_name="guardian_order",
         on_delete=models.CASCADE,
     )
     session = models.ForeignKey(
@@ -22,9 +24,14 @@ class Order(CommonInfo):
         on_delete=models.CASCADE,
     )
     student = models.ForeignKey(
-        Student,
+        User,
+        limit_choices_to={
+            "user__role":CDCUser.STUDENT
+        },
+        related_name="student_order",
         on_delete=models.CASCADE,
     )
+
     is_active = models.BooleanField(
         default=True,
     )
