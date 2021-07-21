@@ -1,12 +1,14 @@
 import os
 
 from django.contrib.auth.models import AbstractUser
-from django.db import models
+
+# from django.db import models
 from django.db.models.fields import related
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.functional import cached_property
 
+import salesforce
 from stdimage.models import StdImageField
 
 from ..notifications import NewMentorBgCheckNotification, NewMentorNotification, NewMentorOrderNotification
@@ -14,6 +16,7 @@ from ..notifications import NewMentorBgCheckNotification, NewMentorNotification,
 # from django.contrib.auth import get_user_model
 
 # User = get_user_model()
+
 
 def generate_filename(instance, filename):
     # file will be uploaded to MEDIA_ROOT/avatar/<username>
@@ -30,7 +33,7 @@ class CDCUser(AbstractUser):
     ROLE_CHOICES = [
         (MENTOR, "mentor"),
         (GUARDIAN, "guardian"),
-        (STUDENT,"student"),
+        (STUDENT, "student"),
     ]
 
     HISPANIC = "Hispanic"
@@ -43,71 +46,64 @@ class CDCUser(AbstractUser):
 
     # Common
 
-    role = models.CharField(
-        choices=ROLE_CHOICES,
-        max_length=10,
-    
-    )
+    role = salesforce.models.CharField(choices=ROLE_CHOICES, max_length=10, db_column="Role__c")
 
-    admin_notes = models.TextField(
+    admin_notes = salesforce.models.TextField(
         blank=True,
         null=True,
+        db_column="Admin_Notes__c	",
     )
-
-    is_active = models.BooleanField(
-        # db_column="Active__c",
+    first_name = salesforce.model.CharField(max_length=255, db_column="First_Name__c")
+    is_active = salesforce.models.BooleanField(
+        db_column="Active__c",
         default=True,
     )
 
-    is_public = models.BooleanField(
+    is_public = salesforce.models.BooleanField(
         default=False,
     )
 
-    birthday = models.DateField(
+    birthday = salesforce.models.DateField(
         blank=False,
         null=True,
-        # db_column="Birthdate",
+        db_column="Birthdate",
     )
 
-    gender = models.CharField(
+    gender = salesforce.models.CharField(
         max_length=255,
         blank=False,
         null=True,
-        # db_column="Gender__c",
+        db_column="Gender__c",
     )
 
-    ethnicity = models.CharField(
+    ethnicity = salesforce.models.CharField(
         choices=ETHNICITY,
         max_length=255,
-        # db_column="hed__Ethnicity__c",
+        db_column="hed__Ethnicity__c",
         default="",
     )
 
-    race = models.CharField(
+    race = salesforce.models.CharField(
         max_length=255,
-        # db_column="hed__Race__c",
+        db_column="hed__Race__c",
         default="",
     )
 
-    phone = models.CharField(
+    phone = salesforce.models.CharField(
         max_length=255,
         blank=True,
         null=True,
-        # db_column="Phone",
+        db_column="Phone",
     )
 
     # Mentor-specific
 
-    bio = models.TextField(
+    bio = salesforce.models.TextField(blank=True, null=True, db_column="Description")
+
+    background_check = salesforce.models.BooleanField(
+        default=False,
         blank=True,
         null=True,
-        # db_column="Description"
-    )
-
-    background_check = models.BooleanField(
-        default=False,
-        # blank=True,
-        # null=True,
     )
 
     avatar = StdImageField(
@@ -123,75 +119,64 @@ class CDCUser(AbstractUser):
         null=True,
     )
 
-    avatar_approved = models.BooleanField(
-        default=False,
+    avatar_approved = salesforce.models.BooleanField(
         blank=True,
         null=True,
+        db_column="Avatar_Approved__c",
     )
 
-    work_place = models.CharField(
+    work_place = salesforce.models.CharField(
         max_length=255,
         blank=True,
         null=True,
-        # db_column="GW_Volunteers__Volunteer_Organization__c",
+        db_column="GW_Volunteers__Volunteer_Organization__c",
     )
 
-    home_address = models.CharField(
+    home_address = salesforce.models.CharField(
         max_length=255,
         blank=True,
         null=True,
-        # db_column="npe01__Home_Address__c",
+        db_column="npe01__Home_Address__c",
     )
-    # Guardian 
-    
-    zip = models.CharField(
+    # Guardian
+
+    zip = salesforce.models.CharField(
         max_length=20,
         blank=True,
         null=True,
     )
-    # Student 
+    # Student
 
-    parent = models.ForeignKey(
+    parent = salesforce.models.ForeignKey(
         "self",
         limit_choices_to={
             "user__role": GUARDIAN,
         },
-        related_name = "student_guardian",
-        on_delete=models.CASCADE,
+        related_name="student_guardian",
+        on_delete=salesforce.models.PROTECT,
         blank=True,
         null=True,
+        db_column="Parent__c",
     )
 
-    school_name = models.CharField(
-        max_length=255,
-        null=True,
-    )
-    school_type = models.CharField(
-        max_length=255,
-        null=True,
-    )
-    medical_conditions = models.TextField(
-        blank=True,
-        null=True,
-    )
-    medications = models.TextField(
-        blank=True,
-        null=True,
-    )
-    photo_release = models.BooleanField(
+    school_name = salesforce.models.CharField(max_length=255, null=True, db_column="School_Name__c")
+    school_type = salesforce.models.CharField(max_length=255, null=True, db_column="School_Type__c")
+    medical_conditions = salesforce.models.TextField(blank=True, null=True, db_column="Medical__c")
+    medications = salesforce.models.TextField(blank=True, null=True, db_column="Medications__c")
+    photo_release = salesforce.models.BooleanField(
         "Photo Consent",
         help_text=(
             "I hereby give permission to We All Code to use "
             "the student's image and/or likeness in promotional materials."
         ),
-        default=False,
+        db_column="Photo_Release__c",
         blank=True,
     )
-    consent = models.BooleanField(
+    consent = salesforce.models.BooleanField(
         "General Consent",
         help_text=("I hereby give consent for the student signed up " "above to participate in We All Code."),
-        default=False,
-        blank=True
+        db_column="Consent__c",
+        blank=True,
     )
 
     def __str__(self):
@@ -251,7 +236,7 @@ class CDCUser(AbstractUser):
     def get_students(self):
 
         return CDCUser.objects.filter(
-            role = CDCUser.STUDENT,
+            role=CDCUser.STUDENT,
             guardian=self,
             is_active=True,
         )
@@ -282,7 +267,7 @@ class CDCUser(AbstractUser):
             NewMentorNotification(self).send()
         else:
             # FIXME: Update this to match
-            orig = CDCUser.objects.get(pk=self.pk, role = CDCUser.MENTOR)
+            orig = CDCUser.objects.get(pk=self.pk, role=CDCUser.MENTOR)
             if orig.avatar != self.avatar:
                 self.avatar_approved = False
 

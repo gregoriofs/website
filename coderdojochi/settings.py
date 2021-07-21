@@ -103,6 +103,7 @@ INSTALLED_APPS = [
     "django_nose",
     "meta",
     "captcha",
+    "salesforce",
     # apps
     "accounts",
     "coderdojochi",
@@ -167,12 +168,22 @@ else:
             "PORT": os.environ.get("POSTGRES_PORT"),
         }
     }
+DATABASES["salesforce"] = {
+    "ENGINE": "salesforce.backend",
+    "CONSUMER_KEY": os.environ.get("SALESFORCE_KEY"),  # 'client_id'   in OAuth2 terminology
+    "CONSUMER_SECRET": os.environ.get("SALESFORCE_SECRET"),  # 'client_secret'
+    "USER": os.environ.get("SALESFORCE_USER"),
+    "PASSWORD": os.environ.get("SALESFORCE_PASSWORD"),
+    "HOST": os.environ.get("SALESFORCE_HOST"),
+}
 
 DATABASES["default"]["ATOMIC_REQUESTS"] = True
 
 # Change 'default' database configuration with $DATABASE_URL.
 DATABASES["default"].update(dj_database_url.config(conn_max_age=500, ssl_require=True))
 
+
+DATABASE_ROUTERS = ["salesforce.router.ModelRouter"]
 
 # Password validation
 # https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators
