@@ -168,7 +168,7 @@ else:
             "PORT": os.environ.get("POSTGRES_PORT"),
         }
     }
-DATABASES["salesforce"] = {
+DATABASES['salesforce'] = {
     "ENGINE": "salesforce.backend",
     "CONSUMER_KEY": os.environ.get("SALESFORCE_KEY"),  # 'client_id'   in OAuth2 terminology
     "CONSUMER_SECRET": os.environ.get("SALESFORCE_SECRET"),  # 'client_secret'

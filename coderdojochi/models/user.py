@@ -53,7 +53,7 @@ class CDCUser(AbstractUser):
         null=True,
         db_column="Admin_Notes__c	",
     )
-    first_name = salesforce.model.CharField(max_length=255, db_column="First_Name__c")
+    first_name = salesforce.models.CharField(max_length=255, db_column="First_Name__c")
     is_active = salesforce.models.BooleanField(
         db_column="Active__c",
         default=True,
