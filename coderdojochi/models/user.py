@@ -24,7 +24,7 @@ def generate_filename(instance, filename):
     return f"avatar/{instance.user.username}{file_extension.lower()}"
 
 
-class CDCUser(AbstractUser):
+class CDCUser(salesforce.models.SalesforceModel):
 
     MENTOR = "mentor"
     GUARDIAN = "guardian"
